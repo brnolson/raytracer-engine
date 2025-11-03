@@ -1,63 +1,48 @@
 #pragma once
 #include <cmath>
-#include <algorithm>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 struct Vec3 {
     float x, y, z;
 
-    Vec3(float v = 0) : x(v), y(v), z(v) {}
+    Vec3() : x(0), y(0), z(0) {}
     Vec3(float x, float y, float z) : x(x), y(y), z(z) {}
 
-    Vec3 operator+(const Vec3& v) const { return { x + v.x, y + v.y, z + v.z }; }
-    Vec3 operator-(const Vec3& v) const { return { x - v.x, y - v.y, z - v.z }; }
-    Vec3 operator*(float s) const { return { x * s, y * s, z * s }; }
-    Vec3 operator/(float s) const { return { x / s, y / s, z / s }; }
-
-    // for multiplying colors/vectors component-wise
-    Vec3 operator*(const Vec3& v) const { return { x * v.x, y * v.y, z * v.z }; }
-
+    Vec3 operator+(const Vec3& v) const { return Vec3(x + v.x, y + v.y, z + v.z); }
+    Vec3 operator-(const Vec3& v) const { return Vec3(x - v.x, y - v.y, z - v.z); }
+    Vec3 operator-() const { return Vec3(-x, -y, -z); }
+    Vec3 operator*(float s) const { return Vec3(x * s, y * s, z * s); }
+    Vec3 operator*(const Vec3& v) const { return Vec3(x * v.x, y * v.y, z * v.z); }
+    Vec3 operator/(float s) const { return Vec3(x / s, y / s, z / s); }
+    
     Vec3& operator+=(const Vec3& v) {
-        x += v.x;
-        y += v.y;
-        z += v.z;
+        x += v.x; y += v.y; z += v.z;
         return *this;
     }
 
-    Vec3 operator-() const {
-        return { -x, -y, -z };
-    }
-
-
-
-    float dot(const Vec3& v) const {
-        return x * v.x + y * v.y + z * v.z;
-    }
+    float dot(const Vec3& v) const { return x * v.x + y * v.y + z * v.z; }
 
     Vec3 cross(const Vec3& v) const {
-        return {
-            y * v.z - z * v.y,
-            z * v.x - x * v.z,
-            x * v.y - y * v.x
-        };
+        return Vec3(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
     }
 
-    float length() const {
-        return std::sqrt(x * x + y * y + z * z);
-    }
+    float length() const { return std::sqrt(x * x + y * y + z * z); }
 
     Vec3 normalized() const {
         float len = length();
-        return len > 0 ? (*this) / len : *this;
+        return len > 0 ? *this / len : Vec3(0, 0, 0);
     }
 };
 
-// keeps RGB values in valid range
-inline Vec3 clampColor(const Vec3& c) {
-    return {
-        std::clamp(c.x, 0.0f, 1.0f),
-        std::clamp(c.y, 0.0f, 1.0f),
-        std::clamp(c.z, 0.0f, 1.0f)
-    };
-}
-
 using Color = Vec3;
+
+inline Color clampColor(const Color& c) {
+    return Color(
+        std::min(1.0f, std::max(0.0f, c.x)),
+        std::min(1.0f, std::max(0.0f, c.y)),
+        std::min(1.0f, std::max(0.0f, c.z))
+    );
+}

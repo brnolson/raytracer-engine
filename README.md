@@ -1,5 +1,5 @@
 ## To Compile:
 
 ```bash
-g++ -std=c++17 -O2 -o raytracer main.cpp scene.cpp
+g++ -std=c++17 -O3 -o raytracer main.cpp scene.cpp
 ``` 

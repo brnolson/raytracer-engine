@@ -12,28 +12,31 @@ struct PointLight {
 
     PointLight() = default;
     PointLight(const Color& intensity, const Vec3& position)
-        : intensity(intensity), position(position) {
-    }
+        : intensity(intensity), position(position) {}
+};
+
+struct DirectionalLight {
+    Color intensity;
+    Vec3 direction;
+
+    DirectionalLight() = default;
+    DirectionalLight(const Color& intensity, const Vec3& direction)
+        : intensity(intensity), direction(direction.normalized()) {}
 };
 
 struct SpotLight {
     Color intensity;
     Vec3 position;
     Vec3 direction;
-
-    // for inner cone
     float angle1;
-    // for outer cone
     float angle2;
 
     SpotLight() = default;
     SpotLight(const Color& intensity, const Vec3& position, const Vec3& direction,
         float angle1, float angle2)
         : intensity(intensity), position(position), direction(direction.normalized()),
-        angle1(angle1), angle2(angle2) {
-    }
+        angle1(angle1), angle2(angle2) {}
 
-    // calculate how much the light dims based on angle from center
     float getFalloff(const Vec3& p) const {
         Vec3 toPoint = (p - position).normalized();
         float angle = std::acos(toPoint.dot(direction)) * 180.0f / M_PI;
@@ -41,7 +44,6 @@ struct SpotLight {
         if (angle < angle1) return 1.0f;
         if (angle > angle2) return 0.0f;
 
-        // smooth transition between inner and outer cone
         float t = (angle - angle1) / (angle2 - angle1);
         return 1.0f - t;
     }
